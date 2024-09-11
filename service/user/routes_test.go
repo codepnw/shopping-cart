@@ -40,6 +40,23 @@ func TestUserServiceHandlers(t *testing.T) {
 		}
 	})
 
+	t.Run("should fail user payload is nil", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodPost, "/register", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+
+		router.HandleFunc("/register", handler.handleRegister)
+		router.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, rr.Code)
+		}
+	})
+
 	t.Run("should correctly register user", func(t *testing.T) {
 		payload := types.RegisterUserPayload{
 			FirstName: "john",
